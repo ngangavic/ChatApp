@@ -104,6 +104,13 @@ class SignInActivity : AppCompatActivity() {
         textViewTitle.text = title
         textViewMessage.text = message
 
+        if (title=="Confirmation"){
+            alertDialog.setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+                auth.signOut()
+                alert.cancel()
+            })
+        }
+
         alertDialog.setView(customLayout)
         alertDialog.setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which ->
             if (title == "Success") {
@@ -111,11 +118,25 @@ class SignInActivity : AppCompatActivity() {
                 finish()
             } else if (title == "Error") {
                 alert.cancel()
+            }else if (title=="Confirmation"){
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
             }
         })
         alert = alertDialog.create()
         alert.show()
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        alertProgress()
+        if (auth.currentUser!=null){
+            alert.cancel()
+            alertDialog("Confirmation","Do you want to continue as "+auth.currentUser!!.email)
+        }else{
+            alert.cancel()
+        }
     }
 
 
