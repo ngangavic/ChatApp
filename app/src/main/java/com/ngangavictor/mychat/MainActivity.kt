@@ -3,11 +3,15 @@ package com.ngangavictor.mychat
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,10 +24,16 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.ngangavictor.mychat.adapter.MessagesAdapter
 import com.ngangavictor.mychat.adapter.RecipientAdapter
 import com.ngangavictor.mychat.listeners.SelectedRecipient
+import com.ngangavictor.mychat.models.Message
+import com.ngangavictor.mychat.models.MessageStructure
 import com.ngangavictor.mychat.models.Recipient
 import com.ngangavictor.mychat.signin.SignInActivity
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), SelectedRecipient {
 
@@ -35,6 +45,8 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
     private lateinit var auth: FirebaseAuth
     private lateinit var dialog: AlertDialog
     private lateinit var database: DatabaseReference
+    lateinit var messagesList: MutableList<Message>
+    lateinit var messagesAdapter: MessagesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +58,12 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
         imageButtonSend = findViewById(R.id.imageButtonSend)
         editTextMessage = findViewById(R.id.editTextMessage)
 
+        recyclerViewMessages.layoutManager = LinearLayoutManager(this)
+        recyclerViewMessages.setHasFixedSize(true)
+
         auth = FirebaseAuth.getInstance()
         database = Firebase.database.reference
+        messagesList = ArrayList()
 
         clickListeners()
     }
@@ -55,6 +71,109 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
     private fun clickListeners() {
         floatingActionButton.setOnClickListener {
             chooseRecipient()
+        }
+
+        imageButtonSend.setOnClickListener { sendMessage() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (auth.currentUser != null) {
+            fetchMessages()
+        } else {
+            startActivity(Intent(this, SignInActivity::class.java))
+            finish()
+        }
+    }
+
+    private fun fetchMessages() {
+        val fetchChannelQuery = database.child("my-chat").child("chats")
+        fetchChannelQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.child(auth.currentUser!!.uid + "_" + receiverId).exists()) {
+                    getMessages(auth.currentUser!!.uid + "_" + receiverId)
+                } else if (p0.child(receiverId + "_" + auth.currentUser!!.uid).exists()) {
+                    getMessages(receiverId + "_" + auth.currentUser!!.uid)
+                }
+            }
+
+        })
+    }
+
+    private fun getMessages(channel: String) {
+        val fetchMessageQuery = database.child("my-chat").child("chats").child(channel)
+        fetchMessageQuery.addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                Log.e("CHAT ERROR", p0.message)
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                messagesList.clear()
+
+                for (postSnapshot in p0.children) {
+                    Log.e("CHAT DATA", postSnapshot.toString())
+                    Log.e("CHAT DATA FILTERED", postSnapshot.toString())
+                    val message = Message(
+                        postSnapshot.child("senderId").value.toString(),
+                        postSnapshot.child("time").value.toString(),
+                        "",
+                        postSnapshot.child("message").value.toString()
+                    )
+                    messagesList.add(message)
+                }
+                messagesAdapter = MessagesAdapter(messagesList as ArrayList<Message>)
+                messagesAdapter.notifyDataSetChanged()
+                recyclerViewMessages.adapter = messagesAdapter
+                recyclerViewMessages.visibility = View.VISIBLE
+            }
+
+        })
+    }
+
+    private fun sendMessage() {
+        if (receiverId == null) {
+            chooseRecipient()
+        } else {
+            val message = editTextMessage.text.toString()
+            if (TextUtils.isEmpty(message)) {
+                editTextMessage.requestFocus()
+                editTextMessage.error = "Cannot be empty"
+            } else {
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+                val timeFormat = SimpleDateFormat("HH:mm:ss")
+                val calendar = Calendar.getInstance().time
+
+                database.child("my-chat").child("chats")
+                    .child(generateChannel(auth.currentUser!!.uid, receiverId.toString())).push()
+                    .setValue(
+                        MessageStructure(
+                            auth.currentUser!!.uid,
+                            receiverId.toString(),
+                            message,
+                            timeFormat.format(calendar),
+                            dateFormat.format(calendar)
+                        )
+                    )
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show()
+                        editTextMessage.text.clear()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Message not sent", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+    }
+
+    private fun generateChannel(sender: String, receiver: String): String {
+        return if (sender > receiver) {
+            sender + "_" + receiver
+        } else {
+            receiver + "_" + sender
         }
     }
 
@@ -67,7 +186,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
         when (item.itemId) {
             R.id.action_logout -> {
                 auth.signOut()
-                startActivity(Intent(this,SignInActivity::class.java))
+                startActivity(Intent(this, SignInActivity::class.java))
                 finish()
             }
         }
@@ -122,7 +241,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
     override fun setEmail(username: String) {
         textViewReceiver.text = "You are chatting with " + username
         dialog.cancel()
-//        fetchMessages()
+        fetchMessages()
     }
 
     override fun setRecipientId(recipientId: String) {
