@@ -2,6 +2,8 @@ package com.ngangavictor.mychat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -25,5 +27,19 @@ class MainActivity : AppCompatActivity() {
         floatingActionButton=findViewById(R.id.floatingActionButton)
         imageButtonSend=findViewById(R.id.imageButtonSend)
         editTextMessage=findViewById(R.id.editTextMessage)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.action_logout->{
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
