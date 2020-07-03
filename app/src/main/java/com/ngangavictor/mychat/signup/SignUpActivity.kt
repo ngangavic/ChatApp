@@ -28,7 +28,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var textViewLogin: TextView
     private lateinit var buttonRegister: Button
     private lateinit var auth: FirebaseAuth
-    lateinit var alert: AlertDialog
+    private lateinit var alert: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
