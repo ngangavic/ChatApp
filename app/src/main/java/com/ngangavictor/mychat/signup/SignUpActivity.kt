@@ -15,6 +15,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.MainActivity
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.signin.SignInActivity
@@ -29,6 +32,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var buttonRegister: Button
     private lateinit var auth: FirebaseAuth
     private lateinit var alert: AlertDialog
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_NoActionBar)
@@ -48,6 +52,7 @@ class SignUpActivity : AppCompatActivity() {
         buttonRegister = findViewById(R.id.buttonRegister)
 
         auth = FirebaseAuth.getInstance()
+        database = Firebase.database.reference
 
         clickListeners()
     }
@@ -92,13 +97,20 @@ class SignUpActivity : AppCompatActivity() {
             auth.createUserWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        val user = auth.currentUser
-                        alert.cancel()
-                        alertDialog(
-                            "Success",
-                            "Registration was successful. Enjoy using My Chat app"
-                        )
-
+                        database.child("my-chat").child("users").child(auth.currentUser!!.uid)
+                            .child("email")
+                            .setValue(email)
+                            .addOnSuccessListener {
+                                alert.cancel()
+                                alertDialog(
+                                    "Success",
+                                    "Registration was successful. Enjoy using My Chat app"
+                                )
+                            }
+                            .addOnFailureListener {
+                                alert.cancel()
+                                alertDialog("Error", it.message.toString())
+                            }
                     }
                 }.addOnFailureListener {
                     alert.cancel()
