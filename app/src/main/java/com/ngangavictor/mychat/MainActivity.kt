@@ -2,6 +2,8 @@ package com.ngangavictor.mychat
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.AssetFileDescriptor
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -76,6 +78,14 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
         imageButtonSend.setOnClickListener { sendMessage() }
     }
 
+    private fun playSound(){
+        val mediaPlayer = MediaPlayer()
+        val afd:AssetFileDescriptor= assets.openFd("hollow.mp3")
+        mediaPlayer.setDataSource(afd.fileDescriptor)
+        mediaPlayer.prepare()
+        mediaPlayer.start()
+    }
+
     override fun onStart() {
         super.onStart()
         if (auth.currentUser != null) {
@@ -130,6 +140,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
                 recyclerViewMessages.adapter = messagesAdapter
                 recyclerViewMessages.visibility = View.VISIBLE
                 recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
+                playSound()
             }
 
         })
