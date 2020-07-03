@@ -129,6 +129,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
                 messagesAdapter.notifyDataSetChanged()
                 recyclerViewMessages.adapter = messagesAdapter
                 recyclerViewMessages.visibility = View.VISIBLE
+                recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
             }
 
         })
@@ -160,6 +161,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
                     )
                     .addOnSuccessListener {
                         Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show()
+                        recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
                         editTextMessage.text.clear()
                     }
                     .addOnFailureListener {
