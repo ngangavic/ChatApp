@@ -8,15 +8,14 @@
     tools:context=".signup.SignUpActivity">
 
     <ImageView
-        android:layout_marginTop="20dp"
         android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="67dp"
         android:layout_marginLeft="67dp"
         android:layout_marginEnd="68dp"
         android:layout_marginRight="68dp"
-        android:background="@color/colorWhite"
+        android:background="@drawable/circle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +30,6 @@
         android:layout_marginLeft="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
         app:cardBackgroundColor="@color/colorWhite"
         app:cardCornerRadius="10dp"
         app:cardElevation="10dp"
@@ -49,6 +47,7 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
+            android:id="@+id/layoutKeyData"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
