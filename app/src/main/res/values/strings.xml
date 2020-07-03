@@ -10,4 +10,8 @@
     <string name="please_register_for_an_account">Please register for an account</string>
     <string name="hello">Hello</string>
     <string name="image_logo">logo</string>
+    <string name="register_now">Register now</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="login">LOGIN</string>
+    <string name="please_login_to_your_account">Please login to your account</string>
 </resources>
