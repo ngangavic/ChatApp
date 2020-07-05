@@ -1,5 +1,6 @@
 package com.ngangavictor.mychat
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.AssetFileDescriptor
@@ -78,9 +79,9 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
         imageButtonSend.setOnClickListener { sendMessage() }
     }
 
-    private fun playSound(){
+    private fun playSound() {
         val mediaPlayer = MediaPlayer()
-        val afd:AssetFileDescriptor= assets.openFd("hollow.mp3")
+        val afd: AssetFileDescriptor = assets.openFd("hollow.mp3")
         mediaPlayer.setDataSource(afd.fileDescriptor)
         mediaPlayer.prepare()
         mediaPlayer.start()
@@ -209,7 +210,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
     private fun chooseRecipient() {
         val getUsersQuery = database.child("my-chat").child("users")
         val recipientList: MutableList<Recipient> = ArrayList()
-        var adapter: RecipientAdapter? = null
+        var adapter: RecipientAdapter
         val alert = AlertDialog.Builder(this)
         alert.setCancelable(false)
         alert.setTitle("Choose Recipient")
@@ -236,7 +237,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
                 adapter = RecipientAdapter(
                     recipientList as ArrayList<Recipient>, this@MainActivity
                 )
-                adapter?.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
                 recyclerView.adapter = adapter
             }
         })
@@ -251,6 +252,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
         dialog.show()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun setEmail(username: String) {
         textViewReceiver.text = "You are chatting with " + username
         dialog.cancel()

@@ -8,13 +8,16 @@ import com.ngangavictor.mychat.holders.RecipientHolder
 import com.ngangavictor.mychat.listeners.SelectedRecipient
 import com.ngangavictor.mychat.models.Recipient
 
-class RecipientAdapter(private val email: ArrayList<Recipient>, private val userSelected: SelectedRecipient) :
-        RecyclerView.Adapter<RecipientHolder>() {
+class RecipientAdapter(
+    private val email: ArrayList<Recipient>,
+    private val userSelected: SelectedRecipient
+) :
+    RecyclerView.Adapter<RecipientHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipientHolder {
         val viewHolder: RecipientHolder
 
-            val layoutView =
-                    LayoutInflater.from(parent.context).inflate(R.layout.row_chat_recipient, parent, false)
+        val layoutView =
+            LayoutInflater.from(parent.context).inflate(R.layout.row_chat_recipient, parent, false)
         viewHolder = RecipientHolder(layoutView)
         return viewHolder
     }
@@ -24,7 +27,7 @@ class RecipientAdapter(private val email: ArrayList<Recipient>, private val user
     }
 
     override fun onBindViewHolder(holder: RecipientHolder, position: Int) {
-        holder.textViewName.text=email[position].email
+        holder.textViewName.text = email[position].email
         holder.textViewName.setOnClickListener {
             userSelected.setEmail(email[position].email)
             userSelected.setRecipientId(email[position].recipientId)

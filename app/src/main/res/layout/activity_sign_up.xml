@@ -16,11 +16,11 @@
         android:layout_marginEnd="68dp"
         android:layout_marginRight="68dp"
         android:background="@drawable/circle"
+        android:contentDescription="@string/image_logo"
+        android:src="@drawable/logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/logo"
-        android:contentDescription="@string/image_logo" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -41,10 +41,10 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_gravity="center"
-            android:visibility="gone"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/layoutKeyData"
@@ -56,21 +56,21 @@
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:text="@string/hello"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
                 android:textSize="30sp"
-                android:textStyle="bold"
-                android:gravity="center_horizontal" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:text="@string/please_register_for_an_account"
                 android:textAlignment="center"
-                android:textSize="16sp"
-                android:gravity="center_horizontal" />
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,11 +89,11 @@
                     android:id="@+id/editTextEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints=""
                     android:ems="10"
                     android:inputType="textEmailAddress"
                     android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:autofillHints="" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textView6"
@@ -139,9 +139,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:textColor="@color/colorWhite"
                     android:backgroundTint="@color/colorOrange"
-                    android:text="@string/register" />
+                    android:text="@string/register"
+                    android:textColor="@color/colorWhite" />
 
             </LinearLayout>
 

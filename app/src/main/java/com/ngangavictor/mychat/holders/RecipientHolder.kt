@@ -6,6 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ngangavictor.mychat.R
 
 class RecipientHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-    val textViewName: TextView =itemView.findViewById(R.id.textViewName) as TextView
+    RecyclerView.ViewHolder(itemView) {
+    val textViewName: TextView = itemView.findViewById(R.id.textViewName) as TextView
 }

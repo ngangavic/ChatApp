@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="wrap_content"
-    app:cardElevation="3dp"
-    app:cardCornerRadius="3dp"
-    app:contentPadding="10dp"
-    app:cardBackgroundColor="#ffffff"
-    android:layout_marginTop="3dp"
+    android:layout_height="wrap_content"
     android:layout_gravity="start"
-    android:layout_height="wrap_content">
+    android:layout_marginTop="3dp"
+    android:orientation="vertical"
+    app:cardBackgroundColor="#ffffff"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="3dp"
+    app:contentPadding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textViewTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1.00pm"
-                android:textAlignment="textEnd" />
+        <TextView
+            android:id="@+id/textViewTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1.00pm"
+            android:textAlignment="textEnd" />
 
         <View
             android:id="@+id/divider3"
@@ -33,7 +33,7 @@
             android:id="@+id/textViewMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="Hey Yoh" />
+            android:text="Hey Yoh"
+            android:textSize="17sp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

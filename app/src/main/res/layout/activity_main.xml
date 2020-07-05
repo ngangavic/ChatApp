@@ -22,9 +22,9 @@
         android:id="@+id/imageButtonSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_send"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_send" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -32,9 +32,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:clickable="true"
-        app:fabSize="mini"
-        app:backgroundTint="@color/colorOrange"
         android:src="@drawable/ic_edit"
+        app:backgroundTint="@color/colorOrange"
+        app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/imageButtonSend"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -43,9 +43,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="You are chatting with ..."
-        android:textStyle="bold"
-        android:textSize="20sp"
         android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

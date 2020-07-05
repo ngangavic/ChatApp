@@ -76,7 +76,6 @@ class SignInActivity : AppCompatActivity() {
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
 
-                        val user = auth.currentUser
                         alertDialog("Success", "You have successfully signed in")
                     }
                 }.addOnFailureListener {
@@ -104,7 +103,7 @@ class SignInActivity : AppCompatActivity() {
         textViewTitle.text = title
         textViewMessage.text = message
 
-        if (title=="Confirmation"){
+        if (title == "Confirmation") {
             alertDialog.setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
                 auth.signOut()
                 alert.cancel()
@@ -118,7 +117,7 @@ class SignInActivity : AppCompatActivity() {
                 finish()
             } else if (title == "Error") {
                 alert.cancel()
-            }else if (title=="Confirmation"){
+            } else if (title == "Confirmation") {
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
@@ -131,10 +130,10 @@ class SignInActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         alertProgress()
-        if (auth.currentUser!=null){
+        if (auth.currentUser != null) {
             alert.cancel()
-            alertDialog("Confirmation","Do you want to continue as "+auth.currentUser!!.email)
-        }else{
+            alertDialog("Confirmation", "Do you want to continue as " + auth.currentUser!!.email)
+        } else {
             alert.cancel()
         }
     }
