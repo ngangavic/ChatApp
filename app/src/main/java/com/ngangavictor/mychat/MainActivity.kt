@@ -30,6 +30,7 @@ import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.adapter.MessagesAdapter
 import com.ngangavictor.mychat.adapter.RecipientAdapter
 import com.ngangavictor.mychat.listeners.SelectedRecipient
+import com.ngangavictor.mychat.main.TabbedActivity
 import com.ngangavictor.mychat.models.Message
 import com.ngangavictor.mychat.models.MessageStructure
 import com.ngangavictor.mychat.models.Recipient
@@ -69,6 +70,7 @@ class MainActivity : AppCompatActivity(), SelectedRecipient {
         messagesList = ArrayList()
 
         clickListeners()
+        startActivity(Intent(this,TabbedActivity::class.java))
     }
 
     private fun clickListeners() {

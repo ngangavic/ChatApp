@@ -15,4 +15,9 @@
     <string name="login">LOGIN</string>
     <string name="please_login_to_your_account">Please login to your account</string>
     <string name="logout">Logout</string>
+    <string name="title_activity_tabbed">TabbedActivity</string>
+    <string name="tab_text_1">Chats</string>
+    <string name="tab_text_2">Contacts</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
