@@ -27,9 +27,11 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.R
+import com.ngangavictor.mychat.adapter.DisplayMessagesAdapter
 import com.ngangavictor.mychat.adapter.MessagesAdapter
 import com.ngangavictor.mychat.adapter.RecipientAdapter
 import com.ngangavictor.mychat.listeners.SelectedRecipient
+import com.ngangavictor.mychat.models.DisplayMessages
 import com.ngangavictor.mychat.models.Message
 import com.ngangavictor.mychat.models.MessageStructure
 import com.ngangavictor.mychat.models.Recipient
@@ -48,7 +50,9 @@ class ChatFragment : Fragment(), SelectedRecipient {
     private lateinit var dialog: AlertDialog
     private lateinit var database: DatabaseReference
     lateinit var messagesList: MutableList<Message>
+    lateinit var displayMessagesList: MutableList<DisplayMessages>
     lateinit var messagesAdapter: MessagesAdapter
+    lateinit var displayMessagesAdapter: DisplayMessagesAdapter
     lateinit var root: View
 
     override fun onCreateView(
@@ -70,8 +74,10 @@ class ChatFragment : Fragment(), SelectedRecipient {
         auth = FirebaseAuth.getInstance()
         database = Firebase.database.reference
         messagesList = ArrayList()
+        displayMessagesList = ArrayList()
 
         clickListeners()
+        fetchDisplayMessages()
         return root
     }
 
@@ -89,6 +95,36 @@ class ChatFragment : Fragment(), SelectedRecipient {
         mediaPlayer.setDataSource(afd.fileDescriptor)
         mediaPlayer.prepare()
         mediaPlayer.start()
+    }
+
+    private fun fetchDisplayMessages(){
+        val fetchDisplayMessagesQuery = database.child("my-chat").child("display-chats")
+        fetchDisplayMessagesQuery.addValueEventListener(object :ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val combinedKey=snapshot.key.toString()
+                for (data in snapshot.children) {
+                    data.key
+                    Log.e("LAST KEY", data.key.toString().takeLast(28))
+                    Log.e("FIRST KEY", data.key.toString().take(28))
+                    if (auth.currentUser!!.uid==data.key.toString().takeLast(28)||auth.currentUser!!.uid==data.key.toString().take(28)){
+                        val displayMessage = DisplayMessages(
+                            data.child("message").value.toString(),
+                            "email",
+                            data.child("date").value.toString()
+                        )
+                        displayMessagesList.add(displayMessage)
+                    }
+                }
+                displayMessagesAdapter = DisplayMessagesAdapter(displayMessagesList as ArrayList<DisplayMessages>)
+                displayMessagesAdapter.notifyDataSetChanged()
+                recyclerViewMessages.adapter = displayMessagesAdapter
+                recyclerViewMessages.visibility = View.VISIBLE
+            }
+        })
     }
 
     private fun fetchMessages() {
@@ -173,6 +209,12 @@ class ChatFragment : Fragment(), SelectedRecipient {
                         )
                     )
                     .addOnSuccessListener {
+                        database.child("my-chat").child("display-chats")
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId.toString()))
+                            .child("message").setValue(message)
+                        database.child("my-chat").child("display-chats")
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId.toString()))
+                            .child("date").setValue(dateFormat.format(calendar))
                         Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show()
                         recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
                         editTextMessage.text.clear()
