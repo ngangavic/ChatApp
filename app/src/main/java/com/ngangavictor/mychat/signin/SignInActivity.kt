@@ -15,8 +15,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.ngangavictor.mychat.MainActivity
 import com.ngangavictor.mychat.R
+import com.ngangavictor.mychat.main.TabbedActivity
 import com.ngangavictor.mychat.signup.SignUpActivity
 
 class SignInActivity : AppCompatActivity() {
@@ -113,12 +113,12 @@ class SignInActivity : AppCompatActivity() {
         alertDialog.setView(customLayout)
         alertDialog.setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which ->
             if (title == "Success") {
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, TabbedActivity::class.java))
                 finish()
             } else if (title == "Error") {
                 alert.cancel()
             } else if (title == "Confirmation") {
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, TabbedActivity::class.java))
                 finish()
             }
         })

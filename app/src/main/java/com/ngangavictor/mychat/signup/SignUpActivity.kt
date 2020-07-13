@@ -18,8 +18,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.ngangavictor.mychat.MainActivity
 import com.ngangavictor.mychat.R
+import com.ngangavictor.mychat.main.TabbedActivity
 import com.ngangavictor.mychat.signin.SignInActivity
 
 class SignUpActivity : AppCompatActivity() {
@@ -161,12 +161,12 @@ class SignUpActivity : AppCompatActivity() {
         alertDialog.setView(customLayout)
         alertDialog.setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which ->
             if (title == "Success") {
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, TabbedActivity::class.java))
                 finish()
             } else if (title == "Error") {
                 alert.cancel()
             } else if (title == "Confirmation") {
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, TabbedActivity::class.java))
                 finish()
             }
         })

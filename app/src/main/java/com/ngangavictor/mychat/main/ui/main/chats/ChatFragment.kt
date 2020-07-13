@@ -26,7 +26,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.ngangavictor.mychat.MainActivity
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.MessagesAdapter
 import com.ngangavictor.mychat.adapter.RecipientAdapter
