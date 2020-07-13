@@ -105,7 +105,6 @@ class ChatFragment : Fragment(), SelectedRecipient {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                val combinedKey=snapshot.key.toString()
                 for (data in snapshot.children) {
                     data.key
                     Log.e("LAST KEY", data.key.toString().takeLast(28))
@@ -113,7 +112,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
                     if (auth.currentUser!!.uid==data.key.toString().takeLast(28)||auth.currentUser!!.uid==data.key.toString().take(28)){
                         val displayMessage = DisplayMessages(
                             data.child("message").value.toString(),
-                            "email",
+                            data.child(getOtherUid(data.key.toString())).value.toString(),
                             data.child("date").value.toString()
                         )
                         displayMessagesList.add(displayMessage)
@@ -125,6 +124,15 @@ class ChatFragment : Fragment(), SelectedRecipient {
                 recyclerViewMessages.visibility = View.VISIBLE
             }
         })
+    }
+
+
+    private fun getOtherUid(key:String):String {
+        if (key.take(28)!=auth.currentUser!!.uid){
+            return   key.take(28)
+        }else{
+         return   key.takeLast(28)
+        }
     }
 
     private fun fetchMessages() {
@@ -215,6 +223,12 @@ class ChatFragment : Fragment(), SelectedRecipient {
                         database.child("my-chat").child("display-chats")
                             .child(generateChannel(auth.currentUser!!.uid, receiverId.toString()))
                             .child("date").setValue(dateFormat.format(calendar))
+                        database.child("my-chat").child("display-chats")
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId.toString()))
+                            .child(auth.currentUser!!.uid).setValue(auth.currentUser!!.email)
+                        database.child("my-chat").child("display-chats")
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId.toString()))
+                            .child(receiverId.toString()).setValue(receiverEmail.toString())
                         Toast.makeText(context, "Message sent", Toast.LENGTH_SHORT).show()
                         recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
                         editTextMessage.text.clear()
@@ -281,6 +295,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
 
     @SuppressLint("SetTextI18n")
     override fun setEmail(username: String) {
+        receiverEmail=username
         textViewReceiver.text = "You are chatting with " + username
         dialog.cancel()
         fetchMessages()
@@ -292,6 +307,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
 
     companion object {
         var receiverId: String? = null
+        var receiverEmail: String? = null
 
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
