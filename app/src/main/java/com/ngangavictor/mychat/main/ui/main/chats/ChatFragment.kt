@@ -1,7 +1,6 @@
 package com.ngangavictor.mychat.main.ui.main.chats
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -53,7 +52,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
     lateinit var displayMessagesList: MutableList<DisplayMessages>
     lateinit var messagesAdapter: MessagesAdapter
     lateinit var displayMessagesAdapter: DisplayMessagesAdapter
-    lateinit var root: View
+    private lateinit var root: View
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -97,9 +96,9 @@ class ChatFragment : Fragment(), SelectedRecipient {
         mediaPlayer.start()
     }
 
-    private fun fetchDisplayMessages(){
+    private fun fetchDisplayMessages() {
         val fetchDisplayMessagesQuery = database.child("my-chat").child("display-chats")
-        fetchDisplayMessagesQuery.addValueEventListener(object :ValueEventListener{
+        fetchDisplayMessagesQuery.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
 
             }
@@ -109,7 +108,9 @@ class ChatFragment : Fragment(), SelectedRecipient {
                     data.key
                     Log.e("LAST KEY", data.key.toString().takeLast(28))
                     Log.e("FIRST KEY", data.key.toString().take(28))
-                    if (auth.currentUser!!.uid==data.key.toString().takeLast(28)||auth.currentUser!!.uid==data.key.toString().take(28)){
+                    if (auth.currentUser!!.uid == data.key.toString()
+                            .takeLast(28) || auth.currentUser!!.uid == data.key.toString().take(28)
+                    ) {
                         val displayMessage = DisplayMessages(
                             data.child("message").value.toString(),
                             data.child(getOtherUid(data.key.toString())).value.toString(),
@@ -118,7 +119,8 @@ class ChatFragment : Fragment(), SelectedRecipient {
                         displayMessagesList.add(displayMessage)
                     }
                 }
-                displayMessagesAdapter = DisplayMessagesAdapter(displayMessagesList as ArrayList<DisplayMessages>)
+                displayMessagesAdapter =
+                    DisplayMessagesAdapter(displayMessagesList as ArrayList<DisplayMessages>)
                 displayMessagesAdapter.notifyDataSetChanged()
                 recyclerViewMessages.adapter = displayMessagesAdapter
                 recyclerViewMessages.visibility = View.VISIBLE
@@ -127,11 +129,11 @@ class ChatFragment : Fragment(), SelectedRecipient {
     }
 
 
-    private fun getOtherUid(key:String):String {
-        if (key.take(28)!=auth.currentUser!!.uid){
-            return   key.take(28)
-        }else{
-         return   key.takeLast(28)
+    private fun getOtherUid(key: String): String {
+        return if (key.take(28) != auth.currentUser!!.uid) {
+            key.take(28)
+        } else {
+            key.takeLast(28)
         }
     }
 
@@ -196,8 +198,8 @@ class ChatFragment : Fragment(), SelectedRecipient {
                 editTextMessage.requestFocus()
                 editTextMessage.error = "Cannot be empty"
             } else {
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-                val timeFormat = SimpleDateFormat("HH:mm:ss")
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd",Locale.getDefault())
+                val timeFormat = SimpleDateFormat("HH:mm:ss",Locale.getDefault())
                 val calendar = Calendar.getInstance().time
 
                 database.child("my-chat").child("chats")
@@ -284,8 +286,8 @@ class ChatFragment : Fragment(), SelectedRecipient {
         })
         alert.setView(recyclerView)
         alert.setNegativeButton(
-            "Cancel",
-            DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+            "Cancel"
+        ) { dialog, _ -> dialog.cancel() }
         dialog = alert.create()
         recyclerView.setOnClickListener {
             dialog.cancel()
@@ -295,8 +297,8 @@ class ChatFragment : Fragment(), SelectedRecipient {
 
     @SuppressLint("SetTextI18n")
     override fun setEmail(username: String) {
-        receiverEmail=username
-        textViewReceiver.text = "You are chatting with " + username
+        receiverEmail = username
+        textViewReceiver.text = "You are chatting with $username"
         dialog.cancel()
         fetchMessages()
     }

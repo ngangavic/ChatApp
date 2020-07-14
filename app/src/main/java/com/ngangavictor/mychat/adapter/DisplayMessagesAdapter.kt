@@ -23,7 +23,7 @@ class DisplayMessagesAdapter(private val displayMessages: ArrayList<DisplayMessa
     }
 
     override fun onBindViewHolder(holder: DisplayMessagesHolder, position: Int) {
-        holder.textViewEmail.text=displayMessages[position].email
+        holder.textViewEmail.text = displayMessages[position].email
         holder.textViewMessage.text = displayMessages[position].message
         holder.textViewDate.text = displayMessages[position].date
     }

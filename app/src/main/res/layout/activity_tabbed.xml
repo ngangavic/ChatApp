@@ -15,9 +15,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
             android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
+            android:padding="16dp"
             android:theme="?attr/actionBarTheme" />
 
         <com.google.android.material.tabs.TabLayout

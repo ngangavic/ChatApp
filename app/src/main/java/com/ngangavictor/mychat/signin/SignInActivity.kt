@@ -1,6 +1,5 @@
 package com.ngangavictor.mychat.signin
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -64,23 +63,27 @@ class SignInActivity : AppCompatActivity() {
     private fun login() {
         val email = editTextEmail.text.toString()
         val password = editTextPass.text.toString()
-        if (TextUtils.isEmpty(email)) {
-            editTextEmail.error = "Cannot be empty"
-            editTextEmail.requestFocus()
-        } else if (TextUtils.isEmpty(password)) {
-            editTextPass.error = "Cannot be empty"
-            editTextPass.requestFocus()
-        } else {
-            alertProgress()
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
+        when {
+            TextUtils.isEmpty(email) -> {
+                editTextEmail.error = "Cannot be empty"
+                editTextEmail.requestFocus()
+            }
+            TextUtils.isEmpty(password) -> {
+                editTextPass.error = "Cannot be empty"
+                editTextPass.requestFocus()
+            }
+            else -> {
+                alertProgress()
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
 
-                        alertDialog("Success", "You have successfully signed in")
+                            alertDialog("Success", "You have successfully signed in")
+                        }
+                    }.addOnFailureListener {
+                        alertDialog("Error", it.message.toString())
                     }
-                }.addOnFailureListener {
-                    alertDialog("Error", it.message.toString())
-                }
+            }
         }
     }
 
@@ -104,24 +107,28 @@ class SignInActivity : AppCompatActivity() {
         textViewMessage.text = message
 
         if (title == "Confirmation") {
-            alertDialog.setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+            alertDialog.setNegativeButton("No") { _, _ ->
                 auth.signOut()
                 alert.cancel()
-            })
+            }
         }
 
         alertDialog.setView(customLayout)
-        alertDialog.setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which ->
-            if (title == "Success") {
-                startActivity(Intent(this, TabbedActivity::class.java))
-                finish()
-            } else if (title == "Error") {
-                alert.cancel()
-            } else if (title == "Confirmation") {
-                startActivity(Intent(this, TabbedActivity::class.java))
-                finish()
+        alertDialog.setPositiveButton("Ok") { _, _ ->
+            when (title) {
+                "Success" -> {
+                    startActivity(Intent(this, TabbedActivity::class.java))
+                    finish()
+                }
+                "Error" -> {
+                    alert.cancel()
+                }
+                "Confirmation" -> {
+                    startActivity(Intent(this, TabbedActivity::class.java))
+                    finish()
+                }
             }
-        })
+        }
         alert = alertDialog.create()
         alert.show()
 

@@ -26,10 +26,10 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
         var fragment: Fragment? = null
         when (position) {
             0 -> {
-                fragment = ChatFragment.newInstance("","")
+                fragment = ChatFragment.newInstance("", "")
             }
             1 -> {
-                fragment = ContactFragment.newInstance("","")
+                fragment = ContactFragment.newInstance("", "")
             }
         }
 //        return PlaceholderFragment.newInstance(position + 1)

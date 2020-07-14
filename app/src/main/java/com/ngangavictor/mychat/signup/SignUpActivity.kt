@@ -1,6 +1,5 @@
 package com.ngangavictor.mychat.signup
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -152,24 +151,28 @@ class SignUpActivity : AppCompatActivity() {
         textViewMessage.text = message
 
         if (title == "Confirmation") {
-            alertDialog.setNegativeButton("No", DialogInterface.OnClickListener { dialog, which ->
+            alertDialog.setNegativeButton("No") { _, _ ->
                 auth.signOut()
                 alert.cancel()
-            })
+            }
         }
 
         alertDialog.setView(customLayout)
-        alertDialog.setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which ->
-            if (title == "Success") {
-                startActivity(Intent(this, TabbedActivity::class.java))
-                finish()
-            } else if (title == "Error") {
-                alert.cancel()
-            } else if (title == "Confirmation") {
-                startActivity(Intent(this, TabbedActivity::class.java))
-                finish()
+        alertDialog.setPositiveButton("Ok") { _, _ ->
+            when (title) {
+                "Success" -> {
+                    startActivity(Intent(this, TabbedActivity::class.java))
+                    finish()
+                }
+                "Error" -> {
+                    alert.cancel()
+                }
+                "Confirmation" -> {
+                    startActivity(Intent(this, TabbedActivity::class.java))
+                    finish()
+                }
             }
-        })
+        }
         alert = alertDialog.create()
         alert.show()
 
