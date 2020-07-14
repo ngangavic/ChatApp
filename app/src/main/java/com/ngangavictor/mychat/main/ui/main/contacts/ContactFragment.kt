@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -22,10 +22,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.ContactSearchAdapter
-import com.ngangavictor.mychat.adapter.RecipientAdapter
 import com.ngangavictor.mychat.listeners.SelectedContact
 import com.ngangavictor.mychat.models.ContactSearch
-import com.ngangavictor.mychat.models.Recipient
 
 class ContactFragment : Fragment(), SelectedContact {
 
@@ -39,7 +37,6 @@ class ContactFragment : Fragment(), SelectedContact {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_contact, container, false)
         floatingActionButtonAdd = root.findViewById(R.id.floatingActionButtonAdd)
 
@@ -64,21 +61,23 @@ class ContactFragment : Fragment(), SelectedContact {
         recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         recyclerView.setHasFixedSize(true)
 
-        alertSearch.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which ->dialog.cancel()  })
+        alertSearch.setNegativeButton(
+            "Cancel",
+            DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
 
         buttonSearch.setOnClickListener {
             contactSearchList.clear()
             val getUsersQuery = database.child("my-chat").child("users")
-            getUsersQuery.addValueEventListener(object :ValueEventListener{
+            getUsersQuery.addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {
 
                 }
 
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (data in snapshot.children){
-                        val email=data.child("email").value.toString()
-                        if (email.contains(editTextSearch.text.toString())){
-                            val contactSearch=ContactSearch(data.child("email").value.toString())
+                    for (data in snapshot.children) {
+                        val email = data.child("email").value.toString()
+                        if (email.contains(editTextSearch.text.toString())) {
+                            val contactSearch = ContactSearch(data.child("email").value.toString())
                             contactSearchList.add(contactSearch)
                         }
                     }
@@ -90,10 +89,54 @@ class ContactFragment : Fragment(), SelectedContact {
                 }
 
             })
-         }
+        }
 
         alertDialog = alertSearch.create()
         alertDialog.show()
+    }
+
+    private fun addContact(email: String) {
+        val checkContactQuery =
+            database.child("my-chat").child("contacts").child(auth.currentUser!!.uid)
+                .child(emailTrim(email))
+        checkContactQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                if (snapshot.exists()) {
+                    alertDialog.cancel()
+                    Snackbar.make(requireView(), "Contact exist", Snackbar.LENGTH_SHORT).show()
+                } else {
+
+                    database.child("my-chat").child("contacts")
+                        .child(auth.currentUser!!.uid).child(emailTrim(email)).setValue(email)
+                        .addOnSuccessListener {
+                            alertDialog.cancel()
+                            Snackbar.make(requireView(), "Contact added", Snackbar.LENGTH_SHORT)
+                                .show()
+                        }
+                        .addOnFailureListener {
+                            alertDialog.cancel()
+                            Snackbar.make(
+                                requireView(),
+                                "Contact add error",
+                                Snackbar.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+
+                }
+            }
+
+        })
+
+    }
+
+    private fun emailTrim(email: String): String {
+        return email.replace(".", "").replace("@", "")
     }
 
     companion object {
@@ -109,6 +152,6 @@ class ContactFragment : Fragment(), SelectedContact {
     }
 
     override fun chosenEmail(email: String) {
-
+        addContact(email)
     }
 }
