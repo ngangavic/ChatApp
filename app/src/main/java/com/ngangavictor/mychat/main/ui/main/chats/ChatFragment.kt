@@ -9,10 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,6 +41,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
     private lateinit var editTextMessage: EditText
     private lateinit var imageButtonSend: ImageButton
     private lateinit var floatingActionButton: FloatingActionButton
+    private lateinit var progressBarChats: ProgressBar
     private lateinit var recyclerViewMessages: RecyclerView
     private lateinit var auth: FirebaseAuth
     private lateinit var dialog: AlertDialog
@@ -66,6 +64,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
         floatingActionButton = root.findViewById(R.id.floatingActionButton)
         imageButtonSend = root.findViewById(R.id.imageButtonSend)
         editTextMessage = root.findViewById(R.id.editTextMessage)
+        progressBarChats = root.findViewById(R.id.progressBarChats)
 
         recyclerViewMessages.layoutManager = LinearLayoutManager(context)
         recyclerViewMessages.setHasFixedSize(true)
@@ -103,6 +102,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
 
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (data in snapshot.children) {
                     data.key
@@ -119,11 +119,18 @@ class ChatFragment : Fragment(), SelectedRecipient {
                         displayMessagesList.add(displayMessage)
                     }
                 }
-                displayMessagesAdapter =
-                    DisplayMessagesAdapter(displayMessagesList as ArrayList<DisplayMessages>)
-                displayMessagesAdapter.notifyDataSetChanged()
-                recyclerViewMessages.adapter = displayMessagesAdapter
-                recyclerViewMessages.visibility = View.VISIBLE
+                if (displayMessagesList.size==0){
+                    progressBarChats.visibility=View.GONE
+                    textViewReceiver.text="You don't have any messages"
+                    textViewReceiver.visibility=View.VISIBLE
+                }else {
+                    displayMessagesAdapter =
+                        DisplayMessagesAdapter(displayMessagesList as ArrayList<DisplayMessages>)
+                    displayMessagesAdapter.notifyDataSetChanged()
+                    recyclerViewMessages.adapter = displayMessagesAdapter
+                    progressBarChats.visibility=View.GONE
+                    recyclerViewMessages.visibility = View.VISIBLE
+                }
             }
         })
     }
