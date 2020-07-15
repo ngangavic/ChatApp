@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,11 +26,9 @@ import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.ContactSearchAdapter
 import com.ngangavictor.mychat.adapter.ContactsAdapter
-import com.ngangavictor.mychat.adapter.DisplayMessagesAdapter
 import com.ngangavictor.mychat.listeners.SelectedContact
 import com.ngangavictor.mychat.models.Contact
 import com.ngangavictor.mychat.models.ContactSearch
-import com.ngangavictor.mychat.models.DisplayMessages
 
 class ContactFragment : Fragment(), SelectedContact {
 
@@ -40,6 +40,8 @@ class ContactFragment : Fragment(), SelectedContact {
     private lateinit var alertDialog: AlertDialog
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
+    private lateinit var textViewMessage: TextView
+    private lateinit var progressBarContact: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +50,8 @@ class ContactFragment : Fragment(), SelectedContact {
         root = inflater.inflate(R.layout.fragment_contact, container, false)
         floatingActionButtonAdd = root.findViewById(R.id.floatingActionButtonAdd)
         recyclerViewContacts = root.findViewById(R.id.recyclerViewContacts)
+        textViewMessage = root.findViewById(R.id.textViewMessage)
+        progressBarContact = root.findViewById(R.id.progressBarContact)
 
         recyclerViewContacts.layoutManager = LinearLayoutManager(context)
         recyclerViewContacts.setHasFixedSize(true)
@@ -162,21 +166,28 @@ class ContactFragment : Fragment(), SelectedContact {
         val getContactsQuery =
             database.child("my-chat").child("contacts").child(auth.currentUser!!.uid)
 
-        getContactsQuery.addValueEventListener(object : ValueEventListener{
+        getContactsQuery.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
                 error.message
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-               for (data in snapshot.children){
-                   val contact=Contact(data.value.toString())
-                   Log.e("CONTACT VALUE",data.value.toString())
-                   contactsList.add(contact)
-               }
-                contactsAdapter=ContactsAdapter(contactsList as ArrayList<Contact>)
-                contactsAdapter.notifyDataSetChanged()
-                recyclerViewContacts.adapter = contactsAdapter
-                recyclerViewContacts.visibility = View.VISIBLE
+                for (data in snapshot.children) {
+                    val contact = Contact(data.value.toString())
+                    Log.e("CONTACT VALUE", data.value.toString())
+                    contactsList.add(contact)
+                }
+                if (contactsList.size == 0) {
+                    progressBarContact.visibility=View.GONE
+                    textViewMessage.text = "You have no contacts"
+                    textViewMessage.visibility=View.VISIBLE
+                } else {
+                    contactsAdapter = ContactsAdapter(contactsList as ArrayList<Contact>)
+                    contactsAdapter.notifyDataSetChanged()
+                    recyclerViewContacts.adapter = contactsAdapter
+                    progressBarContact.visibility=View.GONE
+                    recyclerViewContacts.visibility = View.VISIBLE
+                }
             }
 
         })
