@@ -43,6 +43,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
     private lateinit var floatingActionButton: FloatingActionButton
     private lateinit var progressBarChats: ProgressBar
     private lateinit var recyclerViewMessages: RecyclerView
+    private lateinit var recyclerViewChats: RecyclerView
     private lateinit var auth: FirebaseAuth
     private lateinit var dialog: AlertDialog
     private lateinit var database: DatabaseReference
@@ -56,11 +57,11 @@ class ChatFragment : Fragment(), SelectedRecipient {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_chat, container, false)
 
         textViewReceiver = root.findViewById(R.id.textViewReceiver)
         recyclerViewMessages = root.findViewById(R.id.recyclerViewMessages)
+        recyclerViewChats = root.findViewById(R.id.recyclerViewChats)
         floatingActionButton = root.findViewById(R.id.floatingActionButton)
         imageButtonSend = root.findViewById(R.id.imageButtonSend)
         editTextMessage = root.findViewById(R.id.editTextMessage)
@@ -69,13 +70,16 @@ class ChatFragment : Fragment(), SelectedRecipient {
         recyclerViewMessages.layoutManager = LinearLayoutManager(context)
         recyclerViewMessages.setHasFixedSize(true)
 
+        recyclerViewChats.layoutManager = LinearLayoutManager(context)
+        recyclerViewChats.setHasFixedSize(true)
+
         auth = FirebaseAuth.getInstance()
         database = Firebase.database.reference
         messagesList = ArrayList()
         displayMessagesList = ArrayList()
 
         clickListeners()
-        fetchDisplayMessages()
+            fetchDisplayMessages()
         return root
     }
 
@@ -96,43 +100,49 @@ class ChatFragment : Fragment(), SelectedRecipient {
     }
 
     private fun fetchDisplayMessages() {
-        val fetchDisplayMessagesQuery = database.child("my-chat").child("display-chats")
-        fetchDisplayMessagesQuery.addValueEventListener(object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
+            val fetchDisplayMessagesQuery = database.child("my-chat").child("display-chats")
+            fetchDisplayMessagesQuery.addValueEventListener(object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
 
-            }
+                }
 
-            @SuppressLint("SetTextI18n")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (data in snapshot.children) {
-                    data.key
-                    Log.e("LAST KEY", data.key.toString().takeLast(28))
-                    Log.e("FIRST KEY", data.key.toString().take(28))
-                    if (auth.currentUser!!.uid == data.key.toString()
-                            .takeLast(28) || auth.currentUser!!.uid == data.key.toString().take(28)
-                    ) {
-                        val displayMessage = DisplayMessages(
-                            data.child("message").value.toString(),
-                            data.child(getOtherUid(data.key.toString())).value.toString(),
-                            data.child("date").value.toString()
-                        )
-                        displayMessagesList.add(displayMessage)
+                @SuppressLint("SetTextI18n")
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    displayMessagesList.clear()
+                    for (data in snapshot.children) {
+                        data.key
+                        Log.e("LAST KEY", data.key.toString().takeLast(28))
+                        Log.e("FIRST KEY", data.key.toString().take(28))
+                        if (auth.currentUser!!.uid == data.key.toString()
+                                .takeLast(28) || auth.currentUser!!.uid == data.key.toString()
+                                .take(28)
+                        ) {
+                            val displayMessage = DisplayMessages(
+                                data.child("message").value.toString(),
+                                data.child(getOtherUid(data.key.toString())).value.toString(),
+                                getOtherUid(data.key.toString()),
+                                data.child("date").value.toString()
+                            )
+                            displayMessagesList.add(displayMessage)
+                        }
+                    }
+                    if (displayMessagesList.size == 0) {
+                        progressBarChats.visibility = View.GONE
+                        textViewReceiver.text = "You don't have any messages"
+                        textViewReceiver.visibility = View.VISIBLE
+                    } else {
+                        displayMessagesAdapter =
+                            DisplayMessagesAdapter(
+                                displayMessagesList as ArrayList<DisplayMessages>,
+                                this@ChatFragment
+                            )
+                        displayMessagesAdapter.notifyDataSetChanged()
+                        recyclerViewChats.adapter = displayMessagesAdapter
+                        progressBarChats.visibility = View.GONE
+                        recyclerViewChats.visibility = View.VISIBLE
                     }
                 }
-                if (displayMessagesList.size==0){
-                    progressBarChats.visibility=View.GONE
-                    textViewReceiver.text="You don't have any messages"
-                    textViewReceiver.visibility=View.VISIBLE
-                }else {
-                    displayMessagesAdapter =
-                        DisplayMessagesAdapter(displayMessagesList as ArrayList<DisplayMessages>)
-                    displayMessagesAdapter.notifyDataSetChanged()
-                    recyclerViewMessages.adapter = displayMessagesAdapter
-                    progressBarChats.visibility=View.GONE
-                    recyclerViewMessages.visibility = View.VISIBLE
-                }
-            }
-        })
+            })
     }
 
 
@@ -306,17 +316,20 @@ class ChatFragment : Fragment(), SelectedRecipient {
     override fun setEmail(username: String) {
         receiverEmail = username
         textViewReceiver.text = "You are chatting with $username"
-        dialog.cancel()
-        fetchMessages()
+        textViewReceiver.visibility=View.VISIBLE
     }
 
     override fun setRecipientId(recipientId: String) {
         receiverId = recipientId
+        fetchMessages()
+        currentView="chats"
+        recyclerViewChats.visibility=View.GONE
     }
 
     companion object {
         var receiverId: String? = null
         var receiverEmail: String? = null
+        var currentView:String="display-chats"
 
         @JvmStatic
         fun newInstance(param1: String, param2: String) =

@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.holders.DisplayMessagesHolder
+import com.ngangavictor.mychat.listeners.SelectedRecipient
 import com.ngangavictor.mychat.models.DisplayMessages
 
-class DisplayMessagesAdapter(private val displayMessages: ArrayList<DisplayMessages>) :
+class DisplayMessagesAdapter(private val displayMessages: ArrayList<DisplayMessages>,private val userSelected: SelectedRecipient) :
     RecyclerView.Adapter<DisplayMessagesHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DisplayMessagesHolder {
         val viewHolder: DisplayMessagesHolder
@@ -26,6 +27,11 @@ class DisplayMessagesAdapter(private val displayMessages: ArrayList<DisplayMessa
         holder.textViewEmail.text = displayMessages[position].email
         holder.textViewMessage.text = displayMessages[position].message
         holder.textViewDate.text = displayMessages[position].date
+        holder.textViewEmail.setOnClickListener {
+            userSelected.setEmail(displayMessages[position].email)
+            userSelected.setRecipientId(displayMessages[position].otherUid)
+
+        }
     }
 
 }
