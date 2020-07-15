@@ -75,12 +75,13 @@ class ContactFragment : Fragment(), SelectedContact {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (data in snapshot.children) {
+                        if (data.key != auth.currentUser?.uid) {
                         val email = data.child("email").value.toString()
                         if (email.contains(editTextSearch.text.toString())) {
                             val contactSearch = ContactSearch(data.child("email").value.toString())
                             contactSearchList.add(contactSearch)
                         }
-                    }
+                    }}
                     adapter = ContactSearchAdapter(
                         contactSearchList as ArrayList<ContactSearch>, this@ContactFragment
                     )
