@@ -3,6 +3,7 @@ package com.ngangavictor.mychat.main.ui.main.contacts
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,12 +23,19 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.ContactSearchAdapter
+import com.ngangavictor.mychat.adapter.ContactsAdapter
+import com.ngangavictor.mychat.adapter.DisplayMessagesAdapter
 import com.ngangavictor.mychat.listeners.SelectedContact
+import com.ngangavictor.mychat.models.Contact
 import com.ngangavictor.mychat.models.ContactSearch
+import com.ngangavictor.mychat.models.DisplayMessages
 
 class ContactFragment : Fragment(), SelectedContact {
 
     private lateinit var floatingActionButtonAdd: FloatingActionButton
+    private lateinit var recyclerViewContacts: RecyclerView
+    lateinit var contactsList: MutableList<Contact>
+    lateinit var contactsAdapter: ContactsAdapter
     private lateinit var root: View
     private lateinit var alertDialog: AlertDialog
     private lateinit var auth: FirebaseAuth
@@ -39,11 +47,19 @@ class ContactFragment : Fragment(), SelectedContact {
     ): View? {
         root = inflater.inflate(R.layout.fragment_contact, container, false)
         floatingActionButtonAdd = root.findViewById(R.id.floatingActionButtonAdd)
+        recyclerViewContacts = root.findViewById(R.id.recyclerViewContacts)
+
+        recyclerViewContacts.layoutManager = LinearLayoutManager(context)
+        recyclerViewContacts.setHasFixedSize(true)
 
         auth = FirebaseAuth.getInstance()
         database = Firebase.database.reference
 
         floatingActionButtonAdd.setOnClickListener { searchContactAlert() }
+
+        contactsList = ArrayList()
+
+        loadContacts()
 
         return root
     }
@@ -76,12 +92,14 @@ class ContactFragment : Fragment(), SelectedContact {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (data in snapshot.children) {
                         if (data.key != auth.currentUser?.uid) {
-                        val email = data.child("email").value.toString()
-                        if (email.contains(editTextSearch.text.toString())) {
-                            val contactSearch = ContactSearch(data.child("email").value.toString())
-                            contactSearchList.add(contactSearch)
+                            val email = data.child("email").value.toString()
+                            if (email.contains(editTextSearch.text.toString())) {
+                                val contactSearch =
+                                    ContactSearch(data.child("email").value.toString())
+                                contactSearchList.add(contactSearch)
+                            }
                         }
-                    }}
+                    }
                     adapter = ContactSearchAdapter(
                         contactSearchList as ArrayList<ContactSearch>, this@ContactFragment
                     )
@@ -140,8 +158,31 @@ class ContactFragment : Fragment(), SelectedContact {
         return email.replace(".", "").replace("@", "")
     }
 
-    companion object {
+    private fun loadContacts() {
+        val getContactsQuery =
+            database.child("my-chat").child("contacts").child(auth.currentUser!!.uid)
 
+        getContactsQuery.addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+                error.message
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+               for (data in snapshot.children){
+                   val contact=Contact(data.value.toString())
+                   Log.e("CONTACT VALUE",data.value.toString())
+                   contactsList.add(contact)
+               }
+                contactsAdapter=ContactsAdapter(contactsList as ArrayList<Contact>)
+                contactsAdapter.notifyDataSetChanged()
+                recyclerViewContacts.adapter = contactsAdapter
+                recyclerViewContacts.visibility = View.VISIBLE
+            }
+
+        })
+    }
+
+    companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ContactFragment().apply {
