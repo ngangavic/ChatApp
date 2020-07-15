@@ -27,6 +27,7 @@ import com.ngangavictor.mychat.adapter.DisplayMessagesAdapter
 import com.ngangavictor.mychat.adapter.MessagesAdapter
 import com.ngangavictor.mychat.adapter.RecipientAdapter
 import com.ngangavictor.mychat.listeners.SelectedRecipient
+import com.ngangavictor.mychat.main.TabbedActivity.Companion.currentView
 import com.ngangavictor.mychat.models.DisplayMessages
 import com.ngangavictor.mychat.models.Message
 import com.ngangavictor.mychat.models.MessageStructure
@@ -329,8 +330,6 @@ class ChatFragment : Fragment(), SelectedRecipient {
     companion object {
         var receiverId: String? = null
         var receiverEmail: String? = null
-        var currentView:String="display-chats"
-
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             ChatFragment().apply {

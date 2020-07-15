@@ -1,7 +1,7 @@
 package com.ngangavictor.mychat.main.ui.main.contacts
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -82,8 +82,8 @@ class ContactFragment : Fragment(), SelectedContact {
         recyclerView.setHasFixedSize(true)
 
         alertSearch.setNegativeButton(
-            "Cancel",
-            DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+            "Cancel"
+        ) { dialog, _ -> dialog.cancel() }
 
         buttonSearch.setOnClickListener {
             contactSearchList.clear()
@@ -137,6 +137,7 @@ class ContactFragment : Fragment(), SelectedContact {
                     database.child("my-chat").child("contacts")
                         .child(auth.currentUser!!.uid).child(emailTrim(email)).setValue(email)
                         .addOnSuccessListener {
+                            textViewMessage.visibility = View.GONE
                             alertDialog.cancel()
                             Snackbar.make(requireView(), "Contact added", Snackbar.LENGTH_SHORT)
                                 .show()
@@ -171,21 +172,23 @@ class ContactFragment : Fragment(), SelectedContact {
                 error.message
             }
 
+            @SuppressLint("SetTextI18n")
             override fun onDataChange(snapshot: DataSnapshot) {
+                contactsList.clear()
                 for (data in snapshot.children) {
                     val contact = Contact(data.value.toString())
                     Log.e("CONTACT VALUE", data.value.toString())
                     contactsList.add(contact)
                 }
                 if (contactsList.size == 0) {
-                    progressBarContact.visibility=View.GONE
+                    progressBarContact.visibility = View.GONE
                     textViewMessage.text = "You have no contacts"
-                    textViewMessage.visibility=View.VISIBLE
+                    textViewMessage.visibility = View.VISIBLE
                 } else {
                     contactsAdapter = ContactsAdapter(contactsList as ArrayList<Contact>)
                     contactsAdapter.notifyDataSetChanged()
                     recyclerViewContacts.adapter = contactsAdapter
-                    progressBarContact.visibility=View.GONE
+                    progressBarContact.visibility = View.GONE
                     recyclerViewContacts.visibility = View.VISIBLE
                 }
             }

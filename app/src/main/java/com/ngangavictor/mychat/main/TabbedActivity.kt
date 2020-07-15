@@ -55,4 +55,9 @@ class TabbedActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    companion object {
+        var currentView: String = "display-chats"
+    }
+
 }
