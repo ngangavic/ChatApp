@@ -96,8 +96,9 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun sendMessage() {
-        if (ChatFragment.receiverId == null) {
-            ContactFragment.newInstance("", "")
+        if (receiverId.isNullOrEmpty()) {
+            startActivity(Intent(this,TabbedActivity::class.java))
+            finish()
         } else {
             val message = editTextMessage.text.toString()
             if (TextUtils.isEmpty(message)) {
@@ -112,13 +113,13 @@ class ChatActivity : AppCompatActivity() {
                     .child(
                         generateChannel(
                             auth.currentUser!!.uid,
-                            ChatFragment.receiverId.toString()
+                            receiverId
                         )
                     ).push()
                     .setValue(
                         MessageStructure(
                             auth.currentUser!!.uid,
-                            ChatFragment.receiverId.toString(),
+                            receiverId,
                             message,
                             timeFormat.format(calendar),
                             dateFormat.format(calendar)
@@ -126,17 +127,17 @@ class ChatActivity : AppCompatActivity() {
                     )
                     .addOnSuccessListener {
                         database.child("my-chat").child("display-chats")
-                            .child(generateChannel(auth.currentUser!!.uid, ChatFragment.receiverId.toString()))
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId))
                             .child("message").setValue(message)
                         database.child("my-chat").child("display-chats")
-                            .child(generateChannel(auth.currentUser!!.uid, ChatFragment.receiverId.toString()))
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId))
                             .child("date").setValue(dateFormat.format(calendar))
                         database.child("my-chat").child("display-chats")
-                            .child(generateChannel(auth.currentUser!!.uid, ChatFragment.receiverId.toString()))
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId))
                             .child(auth.currentUser!!.uid).setValue(auth.currentUser!!.email)
                         database.child("my-chat").child("display-chats")
-                            .child(generateChannel(auth.currentUser!!.uid, ChatFragment.receiverId.toString()))
-                            .child(ChatFragment.receiverId.toString()).setValue(ChatFragment.receiverEmail.toString())
+                            .child(generateChannel(auth.currentUser!!.uid, receiverId))
+                            .child(receiverId).setValue(email)
                         Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show()
                         recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
                         editTextMessage.text.clear()
@@ -194,6 +195,7 @@ class ChatActivity : AppCompatActivity() {
                 recyclerViewMessages.adapter = messagesAdapter
                 recyclerViewMessages.visibility = View.VISIBLE
                 recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
+                progressBarChats.visibility=View.GONE
                 playSound()
                 textViewReceiver.setText(email)
             }
