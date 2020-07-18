@@ -3,12 +3,13 @@ package com.ngangavictor.mychat.chat
 import android.content.Intent
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -20,10 +21,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.MessagesAdapter
-import com.ngangavictor.mychat.listeners.SelectedRecipient
 import com.ngangavictor.mychat.main.TabbedActivity
-import com.ngangavictor.mychat.main.ui.main.chats.ChatFragment
-import com.ngangavictor.mychat.main.ui.main.contacts.ContactFragment
 import com.ngangavictor.mychat.models.Message
 import com.ngangavictor.mychat.models.MessageStructure
 import java.text.SimpleDateFormat
@@ -32,11 +30,12 @@ import kotlin.collections.ArrayList
 
 class ChatActivity : AppCompatActivity() {
 
-    private lateinit var editTextMessage:EditText
-    private lateinit var textViewReceiver:TextView
-    private lateinit var imageButtonSend:ImageButton
-    private lateinit var recyclerViewMessages:RecyclerView
-    private lateinit var progressBarChats:ProgressBar
+    private lateinit var editTextMessage: EditText
+    private lateinit var imageViewBack: ImageView
+    private lateinit var textViewEmail: TextView
+    private lateinit var imageButtonSend: ImageButton
+    private lateinit var recyclerViewMessages: RecyclerView
+    private lateinit var progressBarChats: ProgressBar
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
     lateinit var messagesList: MutableList<Message>
@@ -48,11 +47,10 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        editTextMessage=findViewById(R.id.editTextMessage)
-        textViewReceiver=findViewById(R.id.textViewReceiver)
-        imageButtonSend=findViewById(R.id.imageButtonSend)
-        recyclerViewMessages=findViewById(R.id.recyclerViewMessages)
-        progressBarChats=findViewById(R.id.progressBarChats)
+        editTextMessage = findViewById(R.id.editTextMessage)
+        imageButtonSend = findViewById(R.id.imageButtonSend)
+        recyclerViewMessages = findViewById(R.id.recyclerViewMessages)
+        progressBarChats = findViewById(R.id.progressBarChats)
 
         recyclerViewMessages.layoutManager = LinearLayoutManager(this)
         recyclerViewMessages.setHasFixedSize(true)
@@ -61,22 +59,42 @@ class ChatActivity : AppCompatActivity() {
         database = Firebase.database.reference
         messagesList = ArrayList()
 
-//        receiverId=intent.getStringExtra("receiverId").toString()
-//        email=intent.getStringExtra("email").toString()
+        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+        supportActionBar?.setCustomView(R.layout.custom_chat_action_bar)
+        supportActionBar?.elevation = 0F
+        val view = supportActionBar?.customView
+        textViewEmail = view!!.findViewById(R.id.textViewEmail)
+        imageViewBack = view.findViewById(R.id.imageViewBack)
+
+        imageViewBack.setOnClickListener {
+            startActivity(Intent(this, TabbedActivity::class.java))
+            finish()
+        }
 
         imageButtonSend.setOnClickListener { sendMessage() }
     }
 
     override fun onStart() {
-        if (intent.getStringExtra("receiverId").toString().isNullOrEmpty() || intent.getStringExtra("email").toString().isNullOrEmpty()){
-            startActivity(Intent(this,TabbedActivity::class.java))
+        if (intent.getStringExtra("receiverId").toString().isNullOrEmpty() || intent.getStringExtra(
+                "email"
+            ).toString().isNullOrEmpty()
+        ) {
+            startActivity(Intent(this, TabbedActivity::class.java))
             finish()
-        }else {
+        } else {
             receiverId = intent.getStringExtra("receiverId").toString()
             email = intent.getStringExtra("email").toString()
             fetchMessages()
+            textViewEmail.setText(email)
         }
         super.onStart()
+    }
+
+    override fun onBackPressed() {
+        startActivity(Intent(this, TabbedActivity::class.java))
+        finish()
+        super.onBackPressed()
     }
 
     private fun playSound() {
@@ -97,7 +115,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun sendMessage() {
         if (receiverId.isNullOrEmpty()) {
-            startActivity(Intent(this,TabbedActivity::class.java))
+            startActivity(Intent(this, TabbedActivity::class.java))
             finish()
         } else {
             val message = editTextMessage.text.toString()
@@ -195,9 +213,8 @@ class ChatActivity : AppCompatActivity() {
                 recyclerViewMessages.adapter = messagesAdapter
                 recyclerViewMessages.visibility = View.VISIBLE
                 recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
-                progressBarChats.visibility=View.GONE
+                progressBarChats.visibility = View.GONE
                 playSound()
-                textViewReceiver.setText(email)
             }
 
         })
