@@ -14,59 +14,15 @@
         android:padding="10dp"
         tools:context=".MainActivity">
 
-        <EditText
-            android:id="@+id/editTextMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="start|top"
-            android:inputType="textMultiLine"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageButtonSend"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageButton
-            android:id="@+id/imageButtonSend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_send"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/textViewReceiver"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewChats"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="You are chatting with ..."
-            android:textAlignment="center"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:layout_height="0dp"
+            android:background="@color/colorWhite"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:background="@color/colorWhite"
-            android:visibility="gone"
-            android:id="@+id/recyclerViewChats"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextMessage"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewReceiver" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:background="@color/colorWhite"
-            android:visibility="gone"
-            android:id="@+id/recyclerViewMessages"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextMessage"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewReceiver" />
 
         <ProgressBar
             android:id="@+id/progressBarChats"
