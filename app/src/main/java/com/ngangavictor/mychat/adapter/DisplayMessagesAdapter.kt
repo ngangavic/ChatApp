@@ -28,9 +28,7 @@ class DisplayMessagesAdapter(private val displayMessages: ArrayList<DisplayMessa
         holder.textViewMessage.text = displayMessages[position].message
         holder.textViewDate.text = displayMessages[position].date
         holder.textViewEmail.setOnClickListener {
-            userSelected.setEmail(displayMessages[position].email)
-            userSelected.setRecipientId(displayMessages[position].otherUid)
-
+            userSelected.setRecipientDetails(displayMessages[position].email,displayMessages[position].otherUid)
         }
     }
 

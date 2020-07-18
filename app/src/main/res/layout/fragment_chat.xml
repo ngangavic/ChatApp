@@ -33,18 +33,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:clickable="true"
-            android:src="@drawable/ic_edit"
-            app:backgroundTint="@color/colorOrange"
-            app:fabSize="mini"
-            app:layout_constraintBottom_toTopOf="@+id/imageButtonSend"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <TextView
             android:id="@+id/textViewReceiver"
             android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package com.ngangavictor.mychat.main.ui.main.chats
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -26,8 +27,10 @@ import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.DisplayMessagesAdapter
 import com.ngangavictor.mychat.adapter.MessagesAdapter
 import com.ngangavictor.mychat.adapter.RecipientAdapter
+import com.ngangavictor.mychat.chat.ChatActivity
 import com.ngangavictor.mychat.listeners.SelectedRecipient
 import com.ngangavictor.mychat.main.TabbedActivity.Companion.currentView
+import com.ngangavictor.mychat.main.ui.main.contacts.ContactFragment
 import com.ngangavictor.mychat.models.DisplayMessages
 import com.ngangavictor.mychat.models.Message
 import com.ngangavictor.mychat.models.MessageStructure
@@ -41,7 +44,6 @@ class ChatFragment : Fragment(), SelectedRecipient {
     private lateinit var textViewReceiver: TextView
     private lateinit var editTextMessage: EditText
     private lateinit var imageButtonSend: ImageButton
-    private lateinit var floatingActionButton: FloatingActionButton
     private lateinit var progressBarChats: ProgressBar
     private lateinit var recyclerViewMessages: RecyclerView
     private lateinit var recyclerViewChats: RecyclerView
@@ -63,7 +65,6 @@ class ChatFragment : Fragment(), SelectedRecipient {
         textViewReceiver = root.findViewById(R.id.textViewReceiver)
         recyclerViewMessages = root.findViewById(R.id.recyclerViewMessages)
         recyclerViewChats = root.findViewById(R.id.recyclerViewChats)
-        floatingActionButton = root.findViewById(R.id.floatingActionButton)
         imageButtonSend = root.findViewById(R.id.imageButtonSend)
         editTextMessage = root.findViewById(R.id.editTextMessage)
         progressBarChats = root.findViewById(R.id.progressBarChats)
@@ -79,17 +80,8 @@ class ChatFragment : Fragment(), SelectedRecipient {
         messagesList = ArrayList()
         displayMessagesList = ArrayList()
 
-        clickListeners()
             fetchDisplayMessages()
         return root
-    }
-
-    private fun clickListeners() {
-        floatingActionButton.setOnClickListener {
-            chooseRecipient()
-        }
-
-        imageButtonSend.setOnClickListener { sendMessage() }
     }
 
     private fun playSound() {
@@ -209,7 +201,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
 
     private fun sendMessage() {
         if (receiverId == null) {
-            chooseRecipient()
+            ContactFragment.newInstance("", "")
         } else {
             val message = editTextMessage.text.toString()
             if (TextUtils.isEmpty(message)) {
@@ -269,7 +261,7 @@ class ChatFragment : Fragment(), SelectedRecipient {
     }
 
     private fun chooseRecipient() {
-        val getUsersQuery = database.child("my-chat").child("users")
+        val getUsersQuery = database.child("my-chat").child("contacts").child(auth.currentUser!!.uid)
         val recipientList: MutableList<Recipient> = ArrayList()
         var adapter: RecipientAdapter
         val alert = AlertDialog.Builder(requireActivity())
@@ -313,19 +305,6 @@ class ChatFragment : Fragment(), SelectedRecipient {
         dialog.show()
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun setEmail(username: String) {
-        receiverEmail = username
-        textViewReceiver.text = "You are chatting with $username"
-        textViewReceiver.visibility=View.VISIBLE
-    }
-
-    override fun setRecipientId(recipientId: String) {
-        receiverId = recipientId
-        fetchMessages()
-        currentView="chats"
-        recyclerViewChats.visibility=View.GONE
-    }
 
     companion object {
         var receiverId: String? = null
@@ -338,5 +317,10 @@ class ChatFragment : Fragment(), SelectedRecipient {
                     putString("ARG_PARAM2", param2)
                 }
             }
+    }
+
+    override fun setRecipientDetails(email: String, recipientId: String) {
+        requireActivity().startActivity(Intent(requireActivity(),ChatActivity::class.java).putExtra("email",email).putExtra("receiverId",recipientId))
+        requireActivity().finish()
     }
 }
