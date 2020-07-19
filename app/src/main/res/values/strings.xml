@@ -18,6 +18,11 @@
     <string name="title_activity_tabbed">TabbedActivity</string>
     <string name="tab_text_1">Chats</string>
     <string name="tab_text_2">Contacts</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about">About</string>
+    <string name="about_app"><b>My Chat</b> is a simple chat android application
+        developed with an aim of demonstrating how to build a realtime communication
+        application using firebase. Its developed using Kotlin, firebase realtime
+        database and modern android libraries. </string>
+    <string name="about_dev">Ng\'ang\'a Victor is a mobile applications developer and an open source enthusiast.</string>
+    <string name="github_link"><a href="https://github.com/ngangavic">https://github.com/ngangavic</a></string>
 </resources>
