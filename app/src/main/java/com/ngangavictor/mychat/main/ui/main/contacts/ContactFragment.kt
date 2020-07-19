@@ -2,6 +2,7 @@ package com.ngangavictor.mychat.main.ui.main.contacts
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,11 +27,13 @@ import com.google.firebase.ktx.Firebase
 import com.ngangavictor.mychat.R
 import com.ngangavictor.mychat.adapter.ContactSearchAdapter
 import com.ngangavictor.mychat.adapter.ContactsAdapter
+import com.ngangavictor.mychat.chat.ChatActivity
 import com.ngangavictor.mychat.listeners.SelectedContact
+import com.ngangavictor.mychat.listeners.SelectedRecipient
 import com.ngangavictor.mychat.models.Contact
 import com.ngangavictor.mychat.models.ContactSearch
 
-class ContactFragment : Fragment(), SelectedContact {
+class ContactFragment : Fragment(), SelectedContact, SelectedRecipient {
 
     private lateinit var floatingActionButtonAdd: FloatingActionButton
     private lateinit var recyclerViewContacts: RecyclerView
@@ -118,7 +121,27 @@ class ContactFragment : Fragment(), SelectedContact {
         alertDialog.show()
     }
 
-    private fun addContact(email: String) {
+    private fun getOtherUid(email:String){
+        val getUidQuery=database.child("my-chat").child("users")
+        getUidQuery.addListenerForSingleValueEvent(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (data in snapshot.children){
+                    if (data.child("email").value==email) {
+                        Log.d("OTHER UID", data.key)
+                        addContact(email,data.key.toString())
+                    }
+                }
+            }
+
+        })
+
+    }
+
+    private fun addContact(email: String,otherUid:String) {
         val checkContactQuery =
             database.child("my-chat").child("contacts").child(auth.currentUser!!.uid)
                 .child(emailTrim(email))
@@ -134,8 +157,12 @@ class ContactFragment : Fragment(), SelectedContact {
                     Snackbar.make(requireView(), "Contact exist", Snackbar.LENGTH_SHORT).show()
                 } else {
 
+//                    database.child("my-chat").child("contacts")
+//                        .child(auth.currentUser!!.uid).child(emailTrim(email)).setValue(email)
                     database.child("my-chat").child("contacts")
-                        .child(auth.currentUser!!.uid).child(emailTrim(email)).setValue(email)
+                        .child(auth.currentUser!!.uid).child(emailTrim(email)).child("id").setValue(otherUid)
+                    database.child("my-chat").child("contacts")
+                        .child(auth.currentUser!!.uid).child(emailTrim(email)).child("email").setValue(email)
                         .addOnSuccessListener {
                             textViewMessage.visibility = View.GONE
                             alertDialog.cancel()
@@ -176,7 +203,7 @@ class ContactFragment : Fragment(), SelectedContact {
             override fun onDataChange(snapshot: DataSnapshot) {
                 contactsList.clear()
                 for (data in snapshot.children) {
-                    val contact = Contact(data.value.toString())
+                    val contact = Contact(data.child("email").value.toString(),data.child("id").value.toString())
                     Log.e("CONTACT VALUE", data.value.toString())
                     contactsList.add(contact)
                 }
@@ -185,7 +212,7 @@ class ContactFragment : Fragment(), SelectedContact {
                     textViewMessage.text = "You have no contacts"
                     textViewMessage.visibility = View.VISIBLE
                 } else {
-                    contactsAdapter = ContactsAdapter(contactsList as ArrayList<Contact>)
+                    contactsAdapter = ContactsAdapter(contactsList as ArrayList<Contact>,this@ContactFragment)
                     contactsAdapter.notifyDataSetChanged()
                     recyclerViewContacts.adapter = contactsAdapter
                     progressBarContact.visibility = View.GONE
@@ -208,6 +235,16 @@ class ContactFragment : Fragment(), SelectedContact {
     }
 
     override fun chosenEmail(email: String) {
-        addContact(email)
+        getOtherUid(email)
+    }
+
+    override fun setRecipientDetails(email: String, recipientId: String) {
+        requireActivity().startActivity(
+            Intent(
+                requireActivity(),
+                ChatActivity::class.java
+            ).putExtra("email", email).putExtra("receiverId", recipientId)
+        )
+        requireActivity().finish()
     }
 }
