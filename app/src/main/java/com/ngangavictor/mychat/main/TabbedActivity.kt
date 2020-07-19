@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
@@ -52,12 +53,18 @@ class TabbedActivity : AppCompatActivity() {
                 startActivity(Intent(this, SignInActivity::class.java))
                 finish()
             }
+            R.id.action_about -> {
+                val alertDialog = AlertDialog.Builder(this)
+                val layout = layoutInflater.inflate(R.layout.about_app, null)
+                alertDialog.setView(layout)
+                alertDialog.setPositiveButton(
+                    "Ok"
+                ) { dialog, _ -> dialog.cancel() }
+                val alert = alertDialog.create()
+                alert.show()
+            }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        var currentView: String = "display-chats"
     }
 
 }
