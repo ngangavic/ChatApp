@@ -29,7 +29,7 @@ class RecipientAdapter(
     override fun onBindViewHolder(holder: RecipientHolder, position: Int) {
         holder.textViewName.text = email[position].email
         holder.textViewName.setOnClickListener {
-            userSelected.setRecipientDetails(email[position].email,email[position].recipientId)
+            userSelected.setRecipientDetails(email[position].email, email[position].recipientId)
         }
     }
 }

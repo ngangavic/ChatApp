@@ -1,3 +1,3 @@
 package com.ngangavictor.mychat.models
 
-class ContactSearch(var email:String)
+class ContactSearch(var email: String)
