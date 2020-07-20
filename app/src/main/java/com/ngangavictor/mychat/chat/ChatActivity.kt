@@ -33,6 +33,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var editTextMessage: EditText
     private lateinit var imageViewBack: ImageView
     private lateinit var textViewEmail: TextView
+    private lateinit var textViewNoMessages: TextView
     private lateinit var imageButtonSend: ImageButton
     private lateinit var recyclerViewMessages: RecyclerView
     private lateinit var progressBarChats: ProgressBar
@@ -49,6 +50,7 @@ class ChatActivity : AppCompatActivity() {
 
         editTextMessage = findViewById(R.id.editTextMessage)
         imageButtonSend = findViewById(R.id.imageButtonSend)
+        textViewNoMessages = findViewById(R.id.textViewNoMessages)
         recyclerViewMessages = findViewById(R.id.recyclerViewMessages)
         progressBarChats = findViewById(R.id.progressBarChats)
 
@@ -73,6 +75,10 @@ class ChatActivity : AppCompatActivity() {
         }
 
         imageButtonSend.setOnClickListener { sendMessage() }
+
+        receiverId = intent.getStringExtra("receiverId").toString()
+        email = intent.getStringExtra("email").toString()
+        fetchMessages()
     }
 
     override fun onStart() {
@@ -157,7 +163,11 @@ class ChatActivity : AppCompatActivity() {
                             .child(generateChannel(auth.currentUser!!.uid, receiverId))
                             .child(receiverId).setValue(email)
                         Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show()
-                        recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
+                        try {
+                            recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                         editTextMessage.text.clear()
                     }
                     .addOnFailureListener {
@@ -203,18 +213,27 @@ class ChatActivity : AppCompatActivity() {
                     val message = Message(
                         postSnapshot.child("senderId").value.toString(),
                         postSnapshot.child("time").value.toString(),
-                        "",
+                        postSnapshot.child("date").value.toString(),
                         postSnapshot.child("message").value.toString()
                     )
                     messagesList.add(message)
                 }
-                messagesAdapter = MessagesAdapter(messagesList as ArrayList<Message>)
-                messagesAdapter.notifyDataSetChanged()
-                recyclerViewMessages.adapter = messagesAdapter
-                recyclerViewMessages.visibility = View.VISIBLE
-                recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
-                progressBarChats.visibility = View.GONE
-                playSound()
+                if (messagesList.size == 0) {
+                    progressBarChats.visibility = View.GONE
+                    textViewNoMessages.visibility = View.VISIBLE
+                } else {
+                    messagesAdapter = MessagesAdapter(messagesList as ArrayList<Message>)
+                    messagesAdapter.notifyDataSetChanged()
+                    recyclerViewMessages.adapter = messagesAdapter
+                    recyclerViewMessages.visibility = View.VISIBLE
+                    try {
+                        recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
+                    }catch (e:Exception){
+                        e.printStackTrace()
+                    }
+                    progressBarChats.visibility = View.GONE
+                    playSound()
+                }
             }
 
         })
