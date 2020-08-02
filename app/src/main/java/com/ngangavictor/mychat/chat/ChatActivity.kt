@@ -228,7 +228,7 @@ class ChatActivity : AppCompatActivity() {
                     recyclerViewMessages.visibility = View.VISIBLE
                     try {
                         recyclerViewMessages.scrollToPosition(recyclerViewMessages.adapter?.itemCount!!.toInt() - 1)
-                    }catch (e:Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
                     progressBarChats.visibility = View.GONE

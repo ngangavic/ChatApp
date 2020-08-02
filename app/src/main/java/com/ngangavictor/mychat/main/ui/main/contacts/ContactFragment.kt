@@ -121,18 +121,18 @@ class ContactFragment : Fragment(), SelectedContact, SelectedRecipient {
         alertDialog.show()
     }
 
-    private fun getOtherUid(email:String){
-        val getUidQuery=database.child("my-chat").child("users")
-        getUidQuery.addListenerForSingleValueEvent(object : ValueEventListener{
+    private fun getOtherUid(email: String) {
+        val getUidQuery = database.child("my-chat").child("users")
+        getUidQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
 
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                for (data in snapshot.children){
-                    if (data.child("email").value==email) {
+                for (data in snapshot.children) {
+                    if (data.child("email").value == email) {
                         Log.d("OTHER UID", data.key)
-                        addContact(email,data.key.toString())
+                        addContact(email, data.key.toString())
                     }
                 }
             }
@@ -141,7 +141,7 @@ class ContactFragment : Fragment(), SelectedContact, SelectedRecipient {
 
     }
 
-    private fun addContact(email: String,otherUid:String) {
+    private fun addContact(email: String, otherUid: String) {
         val checkContactQuery =
             database.child("my-chat").child("contacts").child(auth.currentUser!!.uid)
                 .child(emailTrim(email))
@@ -160,9 +160,11 @@ class ContactFragment : Fragment(), SelectedContact, SelectedRecipient {
 //                    database.child("my-chat").child("contacts")
 //                        .child(auth.currentUser!!.uid).child(emailTrim(email)).setValue(email)
                     database.child("my-chat").child("contacts")
-                        .child(auth.currentUser!!.uid).child(emailTrim(email)).child("id").setValue(otherUid)
+                        .child(auth.currentUser!!.uid).child(emailTrim(email)).child("id")
+                        .setValue(otherUid)
                     database.child("my-chat").child("contacts")
-                        .child(auth.currentUser!!.uid).child(emailTrim(email)).child("email").setValue(email)
+                        .child(auth.currentUser!!.uid).child(emailTrim(email)).child("email")
+                        .setValue(email)
                         .addOnSuccessListener {
                             textViewMessage.visibility = View.GONE
                             alertDialog.cancel()
@@ -203,7 +205,10 @@ class ContactFragment : Fragment(), SelectedContact, SelectedRecipient {
             override fun onDataChange(snapshot: DataSnapshot) {
                 contactsList.clear()
                 for (data in snapshot.children) {
-                    val contact = Contact(data.child("email").value.toString(),data.child("id").value.toString())
+                    val contact = Contact(
+                        data.child("email").value.toString(),
+                        data.child("id").value.toString()
+                    )
                     Log.e("CONTACT VALUE", data.value.toString())
                     contactsList.add(contact)
                 }
@@ -212,7 +217,8 @@ class ContactFragment : Fragment(), SelectedContact, SelectedRecipient {
                     textViewMessage.text = "You have no contacts"
                     textViewMessage.visibility = View.VISIBLE
                 } else {
-                    contactsAdapter = ContactsAdapter(contactsList as ArrayList<Contact>,this@ContactFragment)
+                    contactsAdapter =
+                        ContactsAdapter(contactsList as ArrayList<Contact>, this@ContactFragment)
                     contactsAdapter.notifyDataSetChanged()
                     recyclerViewContacts.adapter = contactsAdapter
                     progressBarContact.visibility = View.GONE
